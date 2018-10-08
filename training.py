@@ -15,7 +15,7 @@ from keras.callbacks import TensorBoard
 from datetime import datetime
 
 IMG_WIDTH, IMG_HEIGHT = 299, 299
-NUM_EPOCHS = 100
+NUM_EPOCHS = 50
 BATCH_SIZE = 32
 BATCH_SIZE_VAL = 8
 FC_LAYER_SIZE = 1024
