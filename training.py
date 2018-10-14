@@ -15,7 +15,8 @@ from keras.callbacks import TensorBoard
 from datetime import datetime
 
 IMG_WIDTH, IMG_HEIGHT = 299, 299
-NUM_EPOCHS = 50
+NUM_EPOCHS_TL = 25
+NUM_EPOCHS_FT = 75
 BATCH_SIZE = 32
 BATCH_SIZE_VAL = 8
 FC_LAYER_SIZE = 1024
@@ -95,7 +96,7 @@ def train(train_dir,val_dir):
   
   model.fit_generator(
     train_generator,
-    nb_epoch=NUM_EPOCHS,
+    nb_epoch=NUM_EPOCHS_TL,
     steps_per_epoch=num_train_samples*6/BATCH_SIZE,
     callbacks=[tensorboard],
     validation_data=validation_generator,
@@ -125,7 +126,7 @@ def train(train_dir,val_dir):
   model.fit_generator(
     train_generator,
     steps_per_epoch=num_train_samples*6/BATCH_SIZE,
-    nb_epoch=NUM_EPOCHS,
+    nb_epoch=NUM_EPOCHS_FT,
     callbacks=[tensorboard],
     validation_data=validation_generator,
     nb_val_samples=num_val_samples,
