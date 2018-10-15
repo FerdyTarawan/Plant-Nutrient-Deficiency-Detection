@@ -17,6 +17,7 @@ from datetime import datetime
 IMG_WIDTH, IMG_HEIGHT = 299, 299
 NUM_EPOCHS_TL = 25
 NUM_EPOCHS_FT = 75
+NUM_EPOCHS = 100
 BATCH_SIZE = 32
 BATCH_SIZE_VAL = 8
 FC_LAYER_SIZE = 1024
@@ -91,9 +92,10 @@ def train(train_dir,val_dir):
     layer.trainable = False
   
   model = add_new_last_layer(base_model, num_classes)
-  model.compile(optimizer=Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=None, decay=0.0, amsgrad=False), loss='categorical_crossentropy', metrics=['accuracy'])
+  #model.compile(optimizer=Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=None, decay=0.0, amsgrad=False), loss='categorical_crossentropy', metrics=['accuracy'])
   #model.compile(optimizer=SGD(lr=0.001, momentum=0.9), loss='categorical_crossentropy', metrics=['accuracy'])
   
+  """
   model.fit_generator(
     train_generator,
     nb_epoch=NUM_EPOCHS_TL,
@@ -104,6 +106,7 @@ def train(train_dir,val_dir):
     class_weight='auto')
 
   model.save('Transfer_learning.h5')
+  """
 
   # history_transfer_learning = model.fit_generator(
   #   train_generator,
@@ -121,12 +124,12 @@ def train(train_dir,val_dir):
   for layer in model.layers[NUM_LAYERS_TO_FREEZE:]:
      layer.trainable = True
   #model.compile(optimizer=SGD(lr=0.0001, momentum=0.9), loss='categorical_crossentropy', metrics=['accuracy'])
-  model.compile(optimizer=Adam(lr=0.0001, beta_1=0.9, beta_2=0.999, epsilon=None, decay=0.0, amsgrad=False), loss='categorical_crossentropy', metrics=['accuracy'])
+  model.compile(optimizer=Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=None, decay=0.0, amsgrad=False), loss='categorical_crossentropy', metrics=['accuracy'])
 
   model.fit_generator(
     train_generator,
     steps_per_epoch=num_train_samples*6/BATCH_SIZE,
-    nb_epoch=NUM_EPOCHS_FT,
+    nb_epoch=NUM_EPOCHS,
     callbacks=[tensorboard],
     validation_data=validation_generator,
     nb_val_samples=num_val_samples,
