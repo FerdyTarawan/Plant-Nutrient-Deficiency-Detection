@@ -1,8 +1,6 @@
 import os
 import sys
 import glob
-#import matplotlib.pyplot as plt
-
 import tensorflow as tf
 from keras.backend.tensorflow_backend import set_session
 from keras import __version__
@@ -16,7 +14,7 @@ from datetime import datetime
 
 IMG_WIDTH, IMG_HEIGHT = 299, 299
 NUM_EPOCHS_TL = 25
-NUM_EPOCHS_FT = 75
+NUM_EPOCHS_FT = 100
 NUM_EPOCHS = 100
 BATCH_SIZE = 32
 BATCH_SIZE_VAL = 8
@@ -47,7 +45,7 @@ def train(train_dir,val_dir):
   num_train_samples = get_nb_files(train_dir)
   num_classes = len(glob.glob(train_dir + "/*"))
   num_val_samples = get_nb_files(val_dir)
-  
+
   #tensorboard setting
   if not os.path.isdir(LOG_DIR):
     os.makedirs(LOG_DIR)
@@ -92,10 +90,9 @@ def train(train_dir,val_dir):
     layer.trainable = False
   
   model = add_new_last_layer(base_model, num_classes)
-  #model.compile(optimizer=Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=None, decay=0.0, amsgrad=False), loss='categorical_crossentropy', metrics=['accuracy'])
+  model.compile(optimizer=Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=None, decay=0.0, amsgrad=False), loss='categorical_crossentropy', metrics=['accuracy'])
   #model.compile(optimizer=SGD(lr=0.001, momentum=0.9), loss='categorical_crossentropy', metrics=['accuracy'])
-  
-  """
+
   model.fit_generator(
     train_generator,
     nb_epoch=NUM_EPOCHS_TL,
@@ -105,8 +102,7 @@ def train(train_dir,val_dir):
     nb_val_samples=num_val_samples,
     class_weight='auto')
 
-  model.save('Transfer_learning.h5')
-  """
+  model.save('Transfer_learning.h5') 
 
   # history_transfer_learning = model.fit_generator(
   #   train_generator,
@@ -115,21 +111,19 @@ def train(train_dir,val_dir):
   #   validation_data=validation_generator,
   #   nb_val_samples=num_val_samples,
   #   class_weight='auto')
-	
-  #show_plot(history_transfer_learning)
-  
+
   # fine-tuning
   for layer in model.layers[:NUM_LAYERS_TO_FREEZE]:
      layer.trainable = False
   for layer in model.layers[NUM_LAYERS_TO_FREEZE:]:
      layer.trainable = True
   #model.compile(optimizer=SGD(lr=0.0001, momentum=0.9), loss='categorical_crossentropy', metrics=['accuracy'])
-  model.compile(optimizer=Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=None, decay=0.0, amsgrad=False), loss='categorical_crossentropy', metrics=['accuracy'])
+  model.compile(optimizer=Adam(lr=0.0001, beta_1=0.9, beta_2=0.999, epsilon=None, decay=0.0, amsgrad=False), loss='categorical_crossentropy', metrics=['accuracy'])
 
   model.fit_generator(
     train_generator,
     steps_per_epoch=num_train_samples*6/BATCH_SIZE,
-    nb_epoch=NUM_EPOCHS,
+    nb_epoch=NUM_EPOCHS_FT,
     callbacks=[tensorboard],
     validation_data=validation_generator,
     nb_val_samples=num_val_samples,
@@ -146,24 +140,6 @@ def train(train_dir,val_dir):
     os.makedirs(OUTPUT_DIR)
   
   model.save("{}/{}".format(OUTPUT_DIR,"inceptionResnet-ft.h5"))
-  #show_plot(history_fine_tuning)
-
-def show_plot(history):
-  acc = history.history['acc']
-  val_acc = history.history['val_acc']
-  loss = history.history['loss']
-  val_loss = history.history['val_loss']
-  epochs = range(len(acc))
-
-  plt.plot(epochs, acc, 'r.')
-  plt.plot(epochs, val_acc, 'r')
-  plt.title('Training and validation accuracy')
-
-  plt.figure()
-  plt.plot(epochs, loss, 'r.')
-  plt.plot(epochs, val_loss, 'r-')
-  plt.title('Training and validation loss')
-  plt.show()
   
 def main():
   train_dir = "dataset_new/training"
