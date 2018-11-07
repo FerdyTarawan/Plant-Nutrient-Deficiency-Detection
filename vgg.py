@@ -13,13 +13,13 @@ from keras.callbacks import TensorBoard
 from datetime import datetime
 
 IMG_WIDTH, IMG_HEIGHT = 224, 224
-NUM_EPOCHS_TL = 50
-NUM_EPOCHS_FT = 100
+NUM_EPOCHS_TL = 25
+NUM_EPOCHS_FT = 75
 NUM_EPOCHS = 100
 BATCH_SIZE = 32
 BATCH_SIZE_VAL = 8
 FC_LAYER_SIZE = 1024
-NUM_LAYERS_TO_FREEZE = 249
+NUM_LAYERS_TO_FREEZE = 13
 OUTPUT_DIR = "output"
 LOG_DIR = "logs"
 
@@ -87,7 +87,7 @@ def train(train_dir,val_dir):
   )
 
   #transfer learning
-  base_model = VGG16(weights='imagenet', include_top=False)
+  base_model = VGG16(weights='imagenet', include_top=False, input_shape=(224,224,3))
   for layer in base_model.layers:
     layer.trainable = False
   
@@ -104,7 +104,7 @@ def train(train_dir,val_dir):
     nb_val_samples=num_val_samples,
     class_weight='auto')
 
-  model.save('VGG16-tl50.h5') 
+  #model.save('VGG16-tl50.h5') 
 
   # history_transfer_learning = model.fit_generator(
   #   train_generator,
@@ -115,7 +115,7 @@ def train(train_dir,val_dir):
   #   class_weight='auto')
 
   # fine-tuning
-  '''
+  
   for layer in model.layers[:NUM_LAYERS_TO_FREEZE]:
      layer.trainable = False
   for layer in model.layers[NUM_LAYERS_TO_FREEZE:]:
@@ -143,7 +143,7 @@ def train(train_dir,val_dir):
     os.makedirs(OUTPUT_DIR)
   
   model.save("{}/{}".format(OUTPUT_DIR,"inceptionResnet-ft.h5"))
-  '''
+  
   
 def main():
   train_dir = "dataset_new/training"
